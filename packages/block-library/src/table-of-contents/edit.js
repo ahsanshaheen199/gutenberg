@@ -103,24 +103,31 @@ export default function TableOfContentsEdit( {
 				const blockName = getBlockName( blockClientId );
 				if ( blockName === 'core/nextpage' ) {
 					headingPage++;
+
+					if ( i < blockIndex ) {
+						tocPage++;
+					}
+
+					// If we're only including headings from the current page (of
+					// a paginated post), then exit the loop if we've reached the
+					// pages after the one with the Table of Contents block.
+					if ( onlyIncludeCurrentPage && headingPage > tocPage ) {
+						break;
+					}
+
 					headingPageLink = addQueryArgs(
 						removeQueryArgs( permalink, [ 'page' ] ),
 						{ page: headingPage }
 					);
-					if ( i < blockIndex ) {
-						tocPage++;
-					}
-				} else if ( blockName === 'core/heading' ) {
-					// If we're only including headings from the current page (of a
-					// paginated post), then exit the loop if we've reached headings
-					// on the pages after the one with the Table of Contents block.
-					if ( onlyIncludeCurrentPage && headingPage > tocPage ) {
-						break;
-					}
-					// If we're including all headings or we've reached headings on
-					// the same page as the Table of Contents block, add them to the
-					// list.
-					if ( ! onlyIncludeCurrentPage || headingPage === tocPage ) {
+				}
+				// If we're including all headings or we've reached headings on
+				// the same page as the Table of Contents block, add them to the
+				// list.
+				else if (
+					! onlyIncludeCurrentPage ||
+					headingPage === tocPage
+				) {
+					if ( blockName === 'core/heading' ) {
 						const headingAttributes = getBlockAttributes(
 							blockClientId
 						);
